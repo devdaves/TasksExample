@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http;
 using Castle.Windsor;
 using Owin;
+using Swashbuckle.Application;
 using TasksExample.Api.Infrastructure.Windsor;
 using TasksExample.Api.Infrastructure.Windsor.Installers;
 
@@ -28,7 +29,23 @@ namespace TasksExample.Api
             config.Formatters.XmlFormatter.SupportedMediaTypes.Remove(
                 config.Formatters.XmlFormatter.SupportedMediaTypes.FirstOrDefault(t => t.MediaType == "application/xml"));
 
+            config
+                .EnableSwagger(c =>
+                {
+                    c.SingleApiVersion("v1", "Tasks Example API");
+                    c.IncludeXmlComments(GetXmlCommentsPath());
+                })
+                .EnableSwaggerUi(c =>
+                {
+                    c.DocExpansion(DocExpansion.List);
+                });
+
             appBuilder.UseWebApi(config);
+        }
+
+        protected static string GetXmlCommentsPath()
+        {
+            return $@"{System.AppDomain.CurrentDomain.BaseDirectory}\bin\TasksExample.Api.XML";
         }
     }
 }
