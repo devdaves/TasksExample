@@ -91,6 +91,7 @@
   <ItemGroup>
     <Compile Include="Controllers\HealthControllerTests.cs" />
     <Compile Include="Features\Health\HealthItemsListTests.cs" />
+    <Compile Include="Features\Tasks\TasksListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

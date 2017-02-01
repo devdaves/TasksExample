@@ -126,7 +126,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\HealthController.cs" />
+    <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Features\Health\HealthItemsList.cs" />
+    <Compile Include="Features\Tasks\AddTask.cs" />
+    <Compile Include="Features\Tasks\DeleteTask.cs" />
+    <Compile Include="Features\Tasks\EditTask.cs" />
+    <Compile Include="Features\Tasks\TaskDetail.cs" />
+    <Compile Include="Features\Tasks\TasksList.cs" />
+    <Compile Include="Infrastructure\Data\TasksContext.cs" />
     <Compile Include="Infrastructure\Windsor\ContravariantFilter.cs" />
     <Compile Include="Infrastructure\Windsor\Installers\ControllerInstaller.cs" />
     <Compile Include="Infrastructure\Windsor\Installers\DefaultInstaller.cs" />
@@ -135,6 +142,7 @@
     <Compile Include="Infrastructure\Windsor\WindsorHttpDependencyResolver.cs" />
     <Compile Include="Models\ErrorItem.cs" />
     <Compile Include="Models\HealthItem.cs" />
+    <Compile Include="Models\TaskItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
