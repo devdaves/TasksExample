@@ -17,6 +17,7 @@ namespace TasksExample.Api
         {
             var container = new WindsorContainer().Install(
                 new ControllerInstaller(),
+                new MediatrInstaller(),
                 new DefaultInstaller());
             var httpDependencyResolver = new WindsorHttpDependencyResolver(container);
 

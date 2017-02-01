@@ -3,14 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
+using MediatR;
+using Swashbuckle.Swagger.Annotations;
+using TasksExample.Api.Features.Health;
 using TasksExample.Api.Models;
 
 namespace TasksExample.Api.Controllers
 {
     public class HealthController : ApiController
     {
+        private readonly IMediator mediator;
+
+        public HealthController(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+
         /// <summary>
         /// Returns a list of health items
         /// </summary>
@@ -20,10 +31,11 @@ namespace TasksExample.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
         [Route("health")]
-        [ResponseType(typeof(IEnumerable<HealthItem>))]
-        public IHttpActionResult Get()
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(IEnumerable<HealthItem>))]
+        public async Task<IHttpActionResult> Get()
         {
-            throw new NotImplementedException();
+            var data = await this.mediator.Send(new HealthItemsList.QueryAsync());
+            return this.Ok(data);
         }
 
         /// <summary>
@@ -34,11 +46,17 @@ namespace TasksExample.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
         [Route("health/{key}")]
-        [ResponseType(typeof(HealthItem))]
-        public IHttpActionResult Get(string key)
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(HealthItem))]
+        public async Task<IHttpActionResult> Get(string key)
         {
-            throw new NotImplementedException();
-        }
+            var data = await this.mediator.Send(new HealthItemsList.QueryAsync(key));
 
+            if (data.Any())
+            {
+                return this.Ok(data[0]);
+            }
+
+            return this.NotFound();
+        }
     }
 }
