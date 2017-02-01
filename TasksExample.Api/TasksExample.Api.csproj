@@ -129,6 +129,7 @@
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Features\Health\HealthItemsList.cs" />
     <Compile Include="Features\Tasks\AddTask.cs" />
+    <Compile Include="Features\Tasks\CompleteTask.cs" />
     <Compile Include="Features\Tasks\DeleteTask.cs" />
     <Compile Include="Features\Tasks\EditTask.cs" />
     <Compile Include="Features\Tasks\TaskDetail.cs" />

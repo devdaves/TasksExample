@@ -76,10 +76,10 @@ namespace TasksExample.Api.Controllers
         }
         
         /// <summary>
-        /// Delete a single task
+        /// Edit a single task
         /// </summary>
         /// <remarks>
-        /// Deletes a single task item.
+        /// Edit a single task item.
         /// </remarks>
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
@@ -89,13 +89,12 @@ namespace TasksExample.Api.Controllers
             var result = await this.mediator.Send(new EditTask.CommandAsync(id, completed,description));
             return this.Ok(result);
         }
-
-
+        
         /// <summary>
-        /// Delete a single task
+        /// Create a task
         /// </summary>
         /// <remarks>
-        /// Deletes a single task item.
+        /// Create a task item.
         /// </remarks>
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
@@ -104,6 +103,21 @@ namespace TasksExample.Api.Controllers
         {
             var result = await this.mediator.Send(new AddTask.CommandAsync(completed, description));
             return this.Created($"tasks/{result.Id}", result);
+        }
+
+        /// <summary>
+        /// Complete a task
+        /// </summary>
+        /// <remarks>
+        /// Complete a single task item.
+        /// </remarks>
+        /// <response code="500">Internal Server Error</response>
+        [HttpPut]
+        [Route("tasks/{id}/complete")]
+        public async Task<IHttpActionResult> Complete(int id)
+        {
+            await this.mediator.Publish(new CompleteTask.CommandAsync(id));
+            return this.StatusCode(HttpStatusCode.NoContent);
         }
     }
 }
