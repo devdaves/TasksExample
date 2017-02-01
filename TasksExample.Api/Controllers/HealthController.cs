@@ -34,8 +34,8 @@ namespace TasksExample.Api.Controllers
         [SwaggerResponse(HttpStatusCode.OK, type: typeof(IEnumerable<HealthItem>))]
         public async Task<IHttpActionResult> Get()
         {
-            var data = await this.mediator.Send(new HealthItemsList.QueryAsync());
-            return this.Ok(data);
+            var data = await this.mediator.Send(new HealthItemsList.QueryAsync(""));
+            return this.Ok(data ?? new List<HealthItem>());
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace TasksExample.Api.Controllers
         {
             var data = await this.mediator.Send(new HealthItemsList.QueryAsync(key));
 
-            if (data.Any())
+            if (data != null && data.Any())
             {
                 return this.Ok(data[0]);
             }

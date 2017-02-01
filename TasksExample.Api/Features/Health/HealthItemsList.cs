@@ -15,7 +15,7 @@ namespace TasksExample.Api.Features.Health
         {
             public string Key { get; private set; }
 
-            public QueryAsync(string key = "")
+            public QueryAsync(string key)
             {
                 this.Key = key;
             }
