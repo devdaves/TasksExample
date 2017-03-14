@@ -30,7 +30,7 @@ namespace TasksExample.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
         [Route("tasks")]
-        [SwaggerResponse(HttpStatusCode.OK, type: typeof(IEnumerable<TaskItem>))]
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(ApiResponse<IEnumerable<TaskItem>>))]
         public async Task<IHttpActionResult> Get(int page = 1)
         {
             var data = await this.mediator.Send(new TasksList.QueryAsync(page));
@@ -47,7 +47,7 @@ namespace TasksExample.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpGet]
         [Route("tasks/{id}")]
-        [SwaggerResponse(HttpStatusCode.OK, type: typeof(TaskItem))]
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(ApiResponse<TaskItem>))]
         public async Task<IHttpActionResult> GetById(int id)
         {
             var data = await this.mediator.Send(new TaskDetail.QueryAsync(id));
@@ -84,6 +84,7 @@ namespace TasksExample.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("tasks/{id}")]
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(ApiResponse<TaskItem>))]
         public async Task<IHttpActionResult> Edit(int id, bool completed, string description)
         {
             var result = await this.mediator.Send(new EditTask.CommandAsync(id, completed,description));
@@ -99,6 +100,7 @@ namespace TasksExample.Api.Controllers
         /// <response code="500">Internal Server Error</response>
         [HttpPost]
         [Route("tasks/")]
+        [SwaggerResponse(HttpStatusCode.OK, type: typeof(ApiResponse<TaskItem>))]
         public async Task<IHttpActionResult> Add(bool completed, string description)
         {
             var result = await this.mediator.Send(new AddTask.CommandAsync(completed, description));

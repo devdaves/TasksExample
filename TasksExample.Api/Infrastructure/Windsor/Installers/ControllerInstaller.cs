@@ -6,6 +6,7 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using TasksExample.Api.Infrastructure.Data;
+using TasksExample.Api.Models;
 
 namespace TasksExample.Api.Infrastructure.Windsor.Installers
 {
@@ -20,6 +21,15 @@ namespace TasksExample.Api.Infrastructure.Windsor.Installers
 
             //cheeting way to make persisted in memory data store...
             container.Register(Component.For<ITasksContext>().ImplementedBy<TasksContext>().LifestyleSingleton());
+
+            container.Register(
+                Component.For<IRequestInfo>()
+                    .UsingFactoryMethod(c =>
+                    {
+                        var x = new RequestInfo() {TransactionId = Guid.NewGuid()};
+                        return x;
+                    })
+                    .LifestylePerWebRequest());
         }
     }
 }
