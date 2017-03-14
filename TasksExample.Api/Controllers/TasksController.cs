@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Castle.Core.Logging;
 using MediatR;
 using Swashbuckle.Swagger.Annotations;
 using TasksExample.Api.Features.Tasks;
@@ -15,10 +16,14 @@ namespace TasksExample.Api.Controllers
     public class TasksController : ApiController
     {
         private readonly IMediator mediator;
+        private readonly IRequestInfo requestInfo;
+        private readonly ILogger logger;
 
-        public TasksController(IMediator mediator)
+        public TasksController(IMediator mediator, IRequestInfo requestInfo, ILogger logger)
         {
             this.mediator = mediator;
+            this.requestInfo = requestInfo;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -33,6 +38,7 @@ namespace TasksExample.Api.Controllers
         [SwaggerResponse(HttpStatusCode.OK, type: typeof(ApiResponse<IEnumerable<TaskItem>>))]
         public async Task<IHttpActionResult> Get(int page = 1)
         {
+            this.logger.Debug($"{this.requestInfo.TransactionId} - Getting Tasks");
             var data = await this.mediator.Send(new TasksList.QueryAsync(page));
             return this.Ok(data);
         }

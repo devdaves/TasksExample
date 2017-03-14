@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using Castle.Core.Logging;
 using TasksExample.Api.Models;
 
 namespace TasksExample.Api.Infrastructure.Handlers
@@ -26,6 +27,8 @@ namespace TasksExample.Api.Infrastructure.Handlers
                 return response;
             }
 
+            ILogger logger = (ILogger)request.GetDependencyScope().GetService(typeof(ILogger));
+            var requestInfo = (IRequestInfo)request.GetDependencyScope().GetService(typeof(IRequestInfo));
             object content;
             ErrorResponse errorResponse = null;
 
@@ -43,9 +46,11 @@ namespace TasksExample.Api.Infrastructure.Handlers
                         ExceptionType = error.ExceptionType,
                         StackTrace = error.StackTrace
                     };
+
+                    logger.Error($"{requestInfo.TransactionId} - Error: {error.Message} | {error.ExceptionMessage} | {error.StackTrace}");
                 }
             }
-            var requestInfo = (IRequestInfo)request.GetDependencyScope().GetService(typeof(IRequestInfo));
+            
 
             var newResponse = request.CreateResponse(response.StatusCode, new ApiResponse<object>(response.StatusCode, requestInfo.TransactionId, content, errorResponse));
 
@@ -53,6 +58,8 @@ namespace TasksExample.Api.Infrastructure.Handlers
             {
                 newResponse.Headers.Add(header.Key, header.Value);
             }
+
+            logger.Debug($"{requestInfo.TransactionId} - Returned response");
 
             return newResponse;
         }

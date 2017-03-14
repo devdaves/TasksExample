@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using Castle.Facilities.Logging;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
@@ -30,6 +28,8 @@ namespace TasksExample.Api.Infrastructure.Windsor.Installers
                         return x;
                     })
                     .LifestylePerWebRequest());
+
+            container.AddFacility<LoggingFacility>(f => f.LogUsing(LoggerImplementation.NLog).WithConfig("nlog.config"));
         }
     }
 }
