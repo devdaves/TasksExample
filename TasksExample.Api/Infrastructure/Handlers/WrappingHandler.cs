@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using Castle.Core.Internal;
 using Castle.Core.Logging;
 using TasksExample.Api.Models;
 
@@ -13,22 +14,44 @@ namespace TasksExample.Api.Infrastructure.Handlers
 {
     public class WrappingHandler : DelegatingHandler
     {
+        private IRequestInfo requestInfo;
+        private ILogger logger;
+
+        public WrappingHandler()
+        {
+            // needed by asp.net since DI doesn;t work for MessageHandlers
+        }
+
+        public WrappingHandler(IRequestInfo requestInfo, ILogger logger)
+        {
+            this.requestInfo = requestInfo;
+            this.logger = logger;
+        }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var response = await base.SendAsync(request, cancellationToken);
 
-            return BuildApiResponse(request, response);
+            if (this.requestInfo == null)
+            {
+                this.requestInfo = (IRequestInfo)request.GetDependencyScope().GetService(typeof(IRequestInfo));
+            }
+
+            if (this.logger == null)
+            {
+                this.logger = (ILogger)request.GetDependencyScope().GetService(typeof(ILogger));
+            }
+
+            return this.BuildApiResponse(request, response);
         }
 
-        private static HttpResponseMessage BuildApiResponse(HttpRequestMessage request, HttpResponseMessage response)
+        private HttpResponseMessage BuildApiResponse(HttpRequestMessage request, HttpResponseMessage response)
         {
-            if (request.RequestUri.AbsolutePath.Contains("swagger"))
+            if (this.IsSwagger(request))
             {
                 return response;
             }
 
-            ILogger logger = (ILogger)request.GetDependencyScope().GetService(typeof(ILogger));
-            var requestInfo = (IRequestInfo)request.GetDependencyScope().GetService(typeof(IRequestInfo));
             object content;
             ErrorResponse errorResponse = null;
 
@@ -47,21 +70,24 @@ namespace TasksExample.Api.Infrastructure.Handlers
                         StackTrace = error.StackTrace
                     };
 
-                    logger.Error($"{requestInfo.TransactionId} - Error: {error.Message} | {error.ExceptionMessage} | {error.StackTrace}");
+                    this.logger.Error($"{this.requestInfo.TransactionId} - Error: {error.Message} | {error.ExceptionMessage} | {error.StackTrace}");
                 }
             }
-            
 
-            var newResponse = request.CreateResponse(response.StatusCode, new ApiResponse<object>(response.StatusCode, requestInfo.TransactionId, content, errorResponse));
+            var newResponse = request.CreateResponse(response.StatusCode,
+                new ApiResponse<object>(response.StatusCode, requestInfo.TransactionId, content, errorResponse));
 
-            foreach (var header in response.Headers)
-            {
-                newResponse.Headers.Add(header.Key, header.Value);
-            }
+            response.Headers.ForEach(h => newResponse.Headers.Add(h.Key, h.Value));
 
-            logger.Debug($"{requestInfo.TransactionId} - Returned response");
+            // not needed, just an example of logging all responses
+            this.logger.Debug($"{requestInfo.TransactionId} - Returned response");
 
             return newResponse;
+        }
+
+        private bool IsSwagger(HttpRequestMessage request)
+        {
+            return request.RequestUri.AbsolutePath.ToLowerInvariant().Contains("swagger");
         }
     }
 }
